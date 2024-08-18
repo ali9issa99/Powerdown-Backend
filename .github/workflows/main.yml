@@ -1,6 +1,7 @@
-name: Notify Main Project
+name: Notify Update Submodules
 
-on: push
+on:
+  push:
 
 jobs:
   notify-main-project:
@@ -11,5 +12,5 @@ jobs:
       uses: peter-evans/repository-dispatch@v1
       with:
         token: ${{ secrets.PAT }}
-        repository: ali9.issa99/Powerdown
+        repository: ali9issa99/Powerdown-Fullstack
         event-type: update-submodules-event
