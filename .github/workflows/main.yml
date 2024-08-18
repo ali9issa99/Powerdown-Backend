@@ -11,5 +11,5 @@ jobs:
       uses: peter-evans/repository-dispatch@v1
       with:
         token: ${{ secrets.PAT }}
-        repository: ali9issa99/Powerdown-Backend
+        repository: ali9issa99/Powerdown
         event-type: update-submodules-event
