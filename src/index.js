@@ -2,8 +2,10 @@ import express from "express";
 import dotenv from "dotenv";
 import connectToDatabase from "./database/connection.js";
 
-const app = express();
+
 dotenv.config();
+const app = express();
+
 
 app.use(express.json());
 
