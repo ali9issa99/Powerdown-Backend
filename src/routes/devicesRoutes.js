@@ -4,7 +4,7 @@ import {
     getDevice,
     getAllDevices,
     updateDevice,
-    deleteDevice } from "../controllers/devicesControllers";
+    deleteDevice } from "../controllers/devicesControllers.js";
 
 const router =new Router();
 

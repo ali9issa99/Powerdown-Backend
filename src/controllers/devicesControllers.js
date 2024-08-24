@@ -1,4 +1,4 @@
-import { Device } from "../models/devicesModel";
+import { Device } from "../models/devicesModel.js";
 
 export const createDevice = async (req, res) => {
     try{
