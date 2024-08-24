@@ -38,4 +38,21 @@ export const getAllRooms = async (req, res) => {
   };
 
 
+  export const updateRoom = async (req, res) => {
+    try {
+      const updatedRoom = await Room.findByIdAndUpdate(
+        req.params.id,
+        {
+          room_id: req.body.room_id,
+          roomName: req.body.roomName,
+          devices: req.body.devices,
+        },
+        { new: true }
+      );
   
+      if (!updatedRoom) return res.status(404).json({ message: 'Room not found' });
+      res.status(200).json(updatedRoom);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
