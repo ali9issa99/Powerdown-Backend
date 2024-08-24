@@ -26,4 +26,14 @@ export const getDevice = async (req,res) => {
     }catch(error){
         res.status(500).json({error:error.message});
     }
+};
+
+
+export const getAllDevices = async (req,res)=>{
+    try{
+        const device=await device.find({});
+        res.status(200).json(devices);
+    }catch(error){
+        res.status(500).json({error: error.message});
+    }
 }
