@@ -8,10 +8,10 @@ import {
 
 const router =new Router();
 
-router.post('/devices',createDevice)
-router.get('/devices',getAllDevices)
-router.get('/devices/:id',getDevice)
-router.put('/devices/:id',updateDevice)
-router.delete('/devices/:id',deleteDevice)
+router.post('/',createDevice)
+router.get('/',getAllDevices)
+router.get('/:id',getDevice)
+router.put('/:id',updateDevice)
+router.delete('/:id',deleteDevice)
 
 export default router;
