@@ -58,3 +58,14 @@ export const updateDevice = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+export const deleteDevice =async(req,res)=>{
+    try{
+        const deletedDevice =await Device.findByIdAndDelete(req.params.id);
+        if(!deletedDevice) return res.status(404).json({message: 'Device not found'});
+        res.status(200).json({message: 'Device deleted successfully'});
+        }catch(error){
+            res.status(500).json({error: error.message});
+        }
+};
