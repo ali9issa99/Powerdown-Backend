@@ -37,3 +37,24 @@ export const getAllDevices = async (req,res)=>{
         res.status(500).json({error: error.message});
     }
 }
+
+
+export const updateDevice = async (req, res) => {
+    try {
+      const updatedDevice = await Device.findByIdAndUpdate(
+        req.params.id,
+        {
+          device_id: req.body.device_id,
+          deviceName: req.body.deviceName,
+          room_id: req.body.room_id,
+          status: req.body.status,
+        },
+        { new: true }
+      );
+  
+      if (!updatedDevice) return res.status(404).json({ message: 'Device not found' });
+      res.status(200).json(updatedDevice);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
