@@ -36,4 +36,21 @@ export const getAiSuggestion = async (req, res) => {
     }
   };
 
+
+  export const updateAiSuggestion = async (req, res) => {
+    try {
+      const updatedAiSuggestion = await AiSuggestion.findByIdAndUpdate(
+        req.params.id,
+        {
+          user_id: req.body.user_id,
+          suggestions: req.body.suggestions,
+        },
+        { new: true }
+      );
   
+      if (!updatedAiSuggestion) return res.status(404).json({ message: 'AI Suggestion not found' });
+      res.status(200).json(updatedAiSuggestion);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
