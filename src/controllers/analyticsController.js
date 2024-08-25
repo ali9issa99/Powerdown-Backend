@@ -16,3 +16,14 @@ export const createAnalytics = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+  export const getAnalytics = async (req, res) => {
+    try {
+      const analytics = await Analytics.findById(req.params.id);
+      if (!analytics) return res.status(404).json({ message: 'Analytics not found' });
+      res.status(200).json(analytics);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
