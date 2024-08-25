@@ -54,3 +54,14 @@ export const getAiSuggestion = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+  export const deleteAiSuggestion = async (req, res) => {
+    try {
+      const deletedAiSuggestion = await AiSuggestion.findByIdAndDelete(req.params.id);
+      if (!deletedAiSuggestion) return res.status(404).json({ message: 'AI Suggestion not found' });
+      res.status(200).json({ message: 'AI Suggestion deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
