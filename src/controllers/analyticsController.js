@@ -39,4 +39,22 @@ export const createAnalytics = async (req, res) => {
   };
 
 
+  export const updateAnalytics = async (req, res) => {
+    try {
+      const updatedAnalytics = await Analytics.findByIdAndUpdate(
+        req.params.id,
+        {
+          user_id: req.body.user_id,
+          date: req.body.date,
+          totalUsage: req.body.totalUsage,
+          averageConsumption: req.body.averageConsumption,
+        },
+        { new: true }
+      );
   
+      if (!updatedAnalytics) return res.status(404).json({ message: 'Analytics not found' });
+      res.status(200).json(updatedAnalytics);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
