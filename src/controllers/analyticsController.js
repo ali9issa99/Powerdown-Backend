@@ -27,3 +27,16 @@ export const createAnalytics = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+  export const getAllAnalytics = async (req, res) => {
+    try {
+      const analytics = await Analytics.find({});
+      res.status(200).json(analytics);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+
+  
