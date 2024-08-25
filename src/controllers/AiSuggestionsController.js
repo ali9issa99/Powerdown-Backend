@@ -25,3 +25,15 @@ export const getAiSuggestion = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+  export const getAllAiSuggestions = async (req, res) => {
+    try {
+      const aiSuggestions = await AiSuggestion.find({});
+      res.status(200).json(aiSuggestions);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+  
