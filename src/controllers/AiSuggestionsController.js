@@ -1,4 +1,4 @@
-import AiSuggestion from '../models/AiSuggestion.js';
+import { AiSuggestion } from "../models/AiSuggestionsModel.js";
 
 export const createAiSuggestion = async (req, res) => {
     try {
