@@ -5,7 +5,7 @@ import {
   getRoom,
   updateRoom,
   deleteRoom,
-} from '../controllers/roomController.js';
+} from '../controllers/roomsController.js';
 
 const router =new Router();
 
