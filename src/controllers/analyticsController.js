@@ -58,3 +58,14 @@ export const createAnalytics = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+  export const deleteAnalytics = async (req, res) => {
+    try {
+      const deletedAnalytics = await Analytics.findByIdAndDelete(req.params.id);
+      if (!deletedAnalytics) return res.status(404).json({ message: 'Analytics not found' });
+      res.status(200).json({ message: 'Analytics deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
