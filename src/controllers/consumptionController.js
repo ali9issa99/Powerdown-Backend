@@ -1,4 +1,4 @@
-import { Consumption } from '../models/Consumption.js';
+import { Consumption } from '../models/consumptionModel.js';
 
 
 export const createConsumption = async (req, res) => {
