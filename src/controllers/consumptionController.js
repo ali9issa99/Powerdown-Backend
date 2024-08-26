@@ -16,4 +16,15 @@ export const createConsumption = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+  export const getConsumption = async (req, res) => {
+    try {
+      const consumption = await Consumption.findById(req.params.id);
+      if (!consumption) return res.status(404).json({ message: 'Consumption not found' });
+      res.status(200).json(consumption);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
   
