@@ -1,12 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
 const deviceSchema = new Schema ({
-    device_id:{
-        required: true,
-        type: String,
-        unique: true
-    },
-
     deviceName: {
         required: true,
         type:String
