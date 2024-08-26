@@ -4,7 +4,9 @@ import usersRoutes from "./routes/usersRoutes.js";
 import devicesRoutes from "./routes/devicesRoutes.js";
 import roomsRoutes from "./routes/roomsRoutes.js"
 import AISuggestionsRoutes from "./routes/AiSuggestionsRoutes.js";
+import analyticsRoutes  from "./routes/analyticsRoutes.js";
 import connectToDatabase from "./database/connection.js";
+
 
 
 dotenv.config();
@@ -16,6 +18,7 @@ app.use("/users", usersRoutes);
 app.use('/devices',devicesRoutes);
 app.use('/rooms',roomsRoutes);
 app.use('/aisuggestion',AISuggestionsRoutes);
+app.use('/analytics',analyticsRoutes);
 
 app.listen(8080, () => {
   console.log("Server running on port 8080");
