@@ -3,6 +3,13 @@ import { Room } from "../models/roomsModel.js";
 export const createRoom = async (req, res) => {
   try {
     const { room_id, roomName, devices } = req.body;
+
+    // Check if room_id already exists
+    const existingRoom = await Room.findOne({ room_id });
+    if (existingRoom) {
+      return res.status(400).json({ error: 'room_id already exists' });
+    }
+
     const newRoom = new Room({
       room_id,
       roomName,
@@ -15,6 +22,7 @@ export const createRoom = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 export const getRoom = async (req, res) => {
