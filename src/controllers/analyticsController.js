@@ -1,4 +1,4 @@
-import Analytics from '../models/Analytics.js';
+import { Analytics } from '../models/analyticsModel.js';
 
 export const createAnalytics = async (req, res) => {
     try {
