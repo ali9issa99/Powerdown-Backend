@@ -38,3 +38,22 @@ export const createConsumption = async (req, res) => {
     }
   };
   
+
+  export const updateConsumption = async (req, res) => {
+    try {
+      const updatedConsumption = await Consumption.findByIdAndUpdate(
+        req.params.id,
+        {
+          device_id: req.body.device_id,
+          timeOn: req.body.timeOn,
+          energyUsage: req.body.energyUsage,
+        },
+        { new: true }
+      );
+  
+      if (!updatedConsumption) return res.status(404).json({ message: 'Consumption not found' });
+      res.status(200).json(updatedConsumption);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
