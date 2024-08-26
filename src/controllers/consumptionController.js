@@ -57,3 +57,14 @@ export const createConsumption = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+  export const deleteConsumption = async (req, res) => {
+    try {
+      const deletedConsumption = await Consumption.findByIdAndDelete(req.params.id);
+      if (!deletedConsumption) return res.status(404).json({ message: 'Consumption not found' });
+      res.status(200).json({ message: 'Consumption deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
