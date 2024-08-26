@@ -27,4 +27,14 @@ export const createConsumption = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+
+
+  export const getAllConsumptions = async (req, res) => {
+    try {
+      const consumptions = await Consumption.find({});
+      res.status(200).json(consumptions);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
   
