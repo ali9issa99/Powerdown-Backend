@@ -1,21 +1,21 @@
 import { Device } from "../models/devicesModel.js";
 
 export const createDevice = async (req, res) => {
-    try{
-        const {device_id, deviceName, room_id, status}= req.body;
-            const newDevice = new Device({
-                device_id,
-                deviceName,
-                room_id,
-                status,
-            });
-
-            await newDevice.save();
-            res.status(201).json(newDevice);
-        }catch(error){
-            res.status(500).json({error:error.message});
-        }
-};
+    try {
+      const { device_id, deviceName, room_id, status } = req.body;
+      const newDevice = new Device({
+        device_id,
+        deviceName,
+        room_id,
+        status,
+      });
+  
+      await newDevice.save();
+      res.status(201).json(newDevice);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
 
 
 export const getDevice = async (req,res) => {
@@ -29,16 +29,16 @@ export const getDevice = async (req,res) => {
 };
 
 
-export const getAllDevices = async (req,res)=>{
-    try{
-        const device=await device.find({});
-        res.status(200).json(devices);
-    }catch(error){
-        res.status(500).json({error: error.message});
+export const getAllDevices = async (req, res) => {
+    try {
+      const devices = await Device.find({});
+      res.status(200).json(devices);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-}
+  };
 
-
+  
 export const updateDevice = async (req, res) => {
     try {
       const updatedDevice = await Device.findByIdAndUpdate(
