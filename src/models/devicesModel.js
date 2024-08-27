@@ -1,29 +1,25 @@
 import mongoose, { Schema } from "mongoose";
 
-const deviceSchema = new Schema ({
-    device_id:{
-        required: true,
+const deviceSchema = new Schema({
+    device_id: { 
         type: String,
-        unique: true
-    },
-
-    deviceName: {
         required: true,
-        type:String
-    },
-
-    room_id: {
-        required:true,
+        unique: true 
+        },
+    deviceName: { 
+        type: String,
+        required: true 
+        },
+    room_id: { 
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Room',
-    },
-
-    status:{
-        required:true,
-        type: String,
-        enum:['on','off']
-    }
-})
+        ref: "Room",
+        required: true 
+        },
+    status: { 
+        type: String, 
+        enum: ["on", "off"],
+        required: true
+        },
+  });
 
 export const Device = mongoose.model('Device', deviceSchema);
-
