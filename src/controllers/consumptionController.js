@@ -3,9 +3,8 @@ import { Consumption } from '../models/consumptionModel.js';
 
 export const createConsumption = async (req, res) => {
     try {
-      const { device_id, timeOn, energyUsage } = req.body;
+      const { timeOn, energyUsage } = req.body;
       const newConsumption = new Consumption({
-        device_id,
         timeOn,
         energyUsage,
       });
