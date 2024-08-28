@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const consumptionSchema = new Schema({
+export const consumptionSchema = new Schema({
     timeOn: { 
         type: Date,
         required: true
