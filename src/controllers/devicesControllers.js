@@ -147,3 +147,42 @@ export const deleteDevice = async (req, res) => {
     }
 };
 
+
+
+export const modifyDeviceData = async (req, res) => {
+  const { deviceId, action, data } = req.body; // action could be "add", "update", "remove"
+  const { consumptionId, timeOn, energyUsage } = data; // data related to consumption
+
+  try {
+      let update;
+      
+      if (action === "add") {
+          update = { $push: { consumptions: { timeOn, energyUsage } } };
+      } else if (action === "update") {
+          update = {
+              $set: {
+                  "consumptions.$[elem].timeOn": timeOn,
+                  "consumptions.$[elem].energyUsage": energyUsage
+              }
+          };
+      } else if (action === "remove") {
+          update = { $pull: { consumptions: { _id: consumptionId } } };
+      } else {
+          return res.status(400).json({ message: "Invalid action" });
+      }
+
+      const updatedDevice = await Device.findByIdAndUpdate(
+          deviceId,
+          update,
+          { 
+              new: true, 
+              arrayFilters: action === "update" ? [{ "elem._id": consumptionId }] : []
+          }
+      );
+
+      if (!updatedDevice) return res.status(404).json({ message: 'Device not found' });
+      res.status(200).json(updatedDevice);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
