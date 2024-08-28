@@ -159,3 +159,44 @@ export const deleteRoom = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+// Modify Device Data within Room
+export const modifyRoomDevices = async (req, res) => {
+  const { roomId, action, data } = req.body; // action could be "add", "update", "remove"
+  const { deviceId, deviceName, status } = data; // data related to device
+
+  try {
+      let update;
+
+      if (action === "add") {
+          const newDevice = new Device({ device_id: deviceId, deviceName, room_id: roomId, status });
+          update = { $push: { devices: newDevice } };
+      } else if (action === "update") {
+          update = {
+              $set: {
+                  "devices.$[elem].deviceName": deviceName,
+                  "devices.$[elem].status": status
+              }
+          };
+      } else if (action === "remove") {
+          update = { $pull: { devices: { _id: deviceId } } };
+      } else {
+          return res.status(400).json({ message: "Invalid action" });
+      }
+
+      const updatedRoom = await Room.findByIdAndUpdate(
+          roomId,
+          update,
+          {
+              new: true,
+              arrayFilters: action === "update" ? [{ "elem._id": deviceId }] : []
+          }
+      );
+
+      if (!updatedRoom) return res.status(404).json({ message: 'Room not found' });
+      res.status(200).json(updatedRoom);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
