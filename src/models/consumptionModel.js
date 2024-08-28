@@ -1,11 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
 const consumptionSchema = new Schema({
-    device_id: { 
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Device',
-        required: true
-        },
     timeOn: { 
         type: Date,
         required: true
