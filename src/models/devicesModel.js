@@ -10,11 +10,6 @@ const deviceSchema = new Schema({
         type: String,
         required: true 
         },
-    room_id: { 
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Room",
-        required: true 
-        },
     status: { 
         type: String, 
         enum: ["on", "off"],
