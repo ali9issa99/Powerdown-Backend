@@ -1,4 +1,6 @@
 import mongoose, { Schema } from "mongoose";
+import { deviceSchema } from "./devicesModel.js";
+
 
 const roomSchema = new Schema({
     room_id: {
@@ -10,10 +12,7 @@ const roomSchema = new Schema({
         type: String,
         required: true 
     },
-    devices: [{ 
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Device'
-    }],
-  });
+    devices: [deviceSchema] // Embedding Device
+});
   
   export const Room = mongoose.model('Room', roomSchema);
