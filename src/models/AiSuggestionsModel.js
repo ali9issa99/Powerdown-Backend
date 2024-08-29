@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const aiSuggestionSchema = new Schema({
+export const aiSuggestionSchema = new Schema({
     suggestions: {
         type: String,
         required: true },
