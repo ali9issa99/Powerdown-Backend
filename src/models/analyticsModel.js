@@ -1,11 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
 export const analyticsSchema = new Schema({
-    user_id: { 
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true 
-        },
     date: { 
         type: Date,
         required: true 
