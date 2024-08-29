@@ -34,11 +34,12 @@
 
 // export const User = mongoose.model("User", userSchema);
 
-
 import mongoose, { Schema } from "mongoose";
 import bcrypt from 'bcryptjs';
 import { roomSchema } from './roomsModel.js'; // Import the Room schema
+import { analyticsSchema } from './analyticsModel.js'; // Import the Analytics schema
 
+// User schema with embedded Rooms and Analytics
 const userSchema = new Schema({
     name: {
         type: String,
@@ -55,7 +56,8 @@ const userSchema = new Schema({
     },
     rooms: [
         roomSchema
-    ] 
+    ], // Embedding Room schema
+   
 }, { timestamps: true });
 
 // Hash password before saving the user model
