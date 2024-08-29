@@ -2,7 +2,7 @@ import { User } from "../models/userModel.js";
 import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken.js';
 
-// Create User with embedded rooms and analytics
+// Create User with embedded rooms, analytics, and AI suggestions
 export const createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -18,7 +18,8 @@ export const createUser = async (req, res) => {
       email,
       password: hashedPassword,
       rooms: [], // Initialize with an empty array of rooms
-      analytics: [] // Initialize with an empty array of analytics
+      analytics: [], // Initialize with an empty array of analytics
+      aiSuggestions: [] // Initialize with an empty array of AI suggestions
     });
 
     await newUser.save();
