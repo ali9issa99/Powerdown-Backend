@@ -124,3 +124,44 @@ export const modifyUserRooms = async (req, res) => {
       res.status(500).json({ error: error.message });
   }
 };
+
+// Add or Modify Analytics Data within a User
+export const modifyUserAnalytics = async (req, res) => {
+  const { userId, action, data } = req.body; // action could be "add", "update", "remove"
+  const { analyticsId, date, totalUsage, averageConsumption } = data; // data related to analytics
+
+  try {
+      let update;
+
+      if (action === "add") {
+          const newAnalytics = { _id: analyticsId, date, totalUsage, averageConsumption };
+          update = { $push: { analytics: newAnalytics } };
+      } else if (action === "update") {
+          update = {
+              $set: {
+                  "analytics.$[elem].date": date,
+                  "analytics.$[elem].totalUsage": totalUsage,
+                  "analytics.$[elem].averageConsumption": averageConsumption
+              }
+          };
+      } else if (action === "remove") {
+          update = { $pull: { analytics: { _id: analyticsId } } };
+      } else {
+          return res.status(400).json({ message: "Invalid action" });
+      }
+
+      const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          update,
+          {
+              new: true,
+              arrayFilters: action === "update" ? [{ "elem._id": analyticsId }] : []
+          }
+      );
+
+      if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+      res.status(200).json(updatedUser);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
