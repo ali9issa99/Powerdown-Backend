@@ -34,7 +34,7 @@ export const createUser = async (req, res) => {
   }
 };
 
-// Get a User by ID (with embedded rooms and analytics)
+// Get a User by ID (with embedded rooms, analytics, and AI suggestions)
 export const getUsers = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -45,7 +45,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
-// Get All Users (with embedded rooms and analytics)
+// Get All Users (with embedded rooms, analytics, and AI suggestions)
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -55,7 +55,7 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// Update User (with embedded rooms and analytics)
+// Update User (with embedded rooms, analytics, and AI suggestions)
 export const updateUser = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
@@ -76,7 +76,7 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// Delete User (with embedded rooms and analytics)
+// Delete User (with embedded rooms, analytics, and AI suggestions)
 export const deleteUser = async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id);
