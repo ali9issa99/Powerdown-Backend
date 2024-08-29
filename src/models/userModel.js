@@ -57,7 +57,9 @@ const userSchema = new Schema({
     rooms: [
         roomSchema
     ], // Embedding Room schema
-   
+    analytics: [
+        analyticsSchema
+    ] // Embedding Analytics schema
 }, { timestamps: true });
 
 // Hash password before saving the user model
