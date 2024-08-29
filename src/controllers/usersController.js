@@ -2,6 +2,7 @@ import { User } from "../models/userModel.js";
 import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken.js';
 
+// Create User with embedded rooms
 export const createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -16,6 +17,7 @@ export const createUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      rooms: [] // Initialize with an empty array of rooms
     });
 
     await newUser.save();
@@ -30,7 +32,7 @@ export const createUser = async (req, res) => {
   }
 };
 
-
+// Get a User by ID (with embedded rooms)
 export const getUsers = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -41,6 +43,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
+// Get All Users (with embedded rooms)
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -50,7 +53,7 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-
+// Update User with embedded rooms
 export const updateUser = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
@@ -71,7 +74,7 @@ export const updateUser = async (req, res) => {
   }
 };
 
-
+// Delete User with embedded rooms
 export const deleteUser = async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id);
@@ -81,3 +84,6 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
