@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { deviceSchema } from "./devicesModel.js";
 
 
-const roomSchema = new Schema({
+export const roomSchema = new Schema({
     room_id: {
         type: String,
         required: true,
