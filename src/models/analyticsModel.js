@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const analyticsSchema = new Schema({
+export const analyticsSchema = new Schema({
     user_id: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
