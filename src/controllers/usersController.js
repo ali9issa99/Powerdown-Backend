@@ -87,6 +87,45 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+// Add or Modify Room Data within a User
+export const modifyUserRooms = async (req, res) => {
+  const { userId, action, data } = req.body; // action could be "add", "update", "remove"
+  const { roomId, roomName } = data; // data related to room
+
+  try {
+    let update;
+
+    if (action === "add") {
+      const newRoom = { room_id: roomId, roomName, devices: [] };
+      update = { $push: { rooms: newRoom } };
+    } else if (action === "update") {
+      update = {
+        $set: {
+          "rooms.$[elem].roomName": roomName
+        }
+      };
+    } else if (action === "remove") {
+      update = { $pull: { rooms: { _id: roomId } } };
+    } else {
+      return res.status(400).json({ message: "Invalid action" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      update,
+      {
+        new: true,
+        arrayFilters: action === "update" ? [{ "elem._id": roomId }] : []
+      }
+    );
+
+    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Add or Modify Analytics Data within a User
 export const modifyUserAnalytics = async (req, res) => {
   const { userId, action, data } = req.body; // action could be "add", "update", "remove"
