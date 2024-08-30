@@ -87,82 +87,82 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-// Add or Modify Room Data within a User
-export const modifyUserRooms = async (req, res) => {
-  const { userId, action, data } = req.body; // action could be "add", "update", "remove"
-  const { roomId, roomName } = data; // data related to room
-
-  try {
-      let update;
-
-      if (action === "add") {
-          const newRoom = { room_id: roomId, roomName, devices: [] };
-          update = { $push: { rooms: newRoom } };
-      } else if (action === "update") {
-          update = {
-              $set: {
-                  "rooms.$[elem].roomName": roomName
-              }
-          };
-      } else if (action === "remove") {
-          update = { $pull: { rooms: { _id: roomId } } };
-      } else {
-          return res.status(400).json({ message: "Invalid action" });
-      }
-
-      const updatedUser = await User.findByIdAndUpdate(
-          userId,
-          update,
-          {
-              new: true,
-              arrayFilters: action === "update" ? [{ "elem._id": roomId }] : []
-          }
-      );
-
-      if (!updatedUser) return res.status(404).json({ message: 'User not found' });
-      res.status(200).json(updatedUser);
-  } catch (error) {
-      res.status(500).json({ error: error.message });
-  }
-};
-
 // Add or Modify Analytics Data within a User
 export const modifyUserAnalytics = async (req, res) => {
   const { userId, action, data } = req.body; // action could be "add", "update", "remove"
   const { analyticsId, date, totalUsage, averageConsumption } = data; // data related to analytics
 
   try {
-      let update;
+    let update;
 
-      if (action === "add") {
-          const newAnalytics = { _id: analyticsId, date, totalUsage, averageConsumption };
-          update = { $push: { analytics: newAnalytics } };
-      } else if (action === "update") {
-          update = {
-              $set: {
-                  "analytics.$[elem].date": date,
-                  "analytics.$[elem].totalUsage": totalUsage,
-                  "analytics.$[elem].averageConsumption": averageConsumption
-              }
-          };
-      } else if (action === "remove") {
-          update = { $pull: { analytics: { _id: analyticsId } } };
-      } else {
-          return res.status(400).json({ message: "Invalid action" });
+    if (action === "add") {
+      const newAnalytics = { _id: analyticsId, date, totalUsage, averageConsumption };
+      update = { $push: { analytics: newAnalytics } };
+    } else if (action === "update") {
+      update = {
+        $set: {
+          "analytics.$[elem].date": date,
+          "analytics.$[elem].totalUsage": totalUsage,
+          "analytics.$[elem].averageConsumption": averageConsumption
+        }
+      };
+    } else if (action === "remove") {
+      update = { $pull: { analytics: { _id: analyticsId } } };
+    } else {
+      return res.status(400).json({ message: "Invalid action" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      update,
+      {
+        new: true,
+        arrayFilters: action === "update" ? [{ "elem._id": analyticsId }] : []
       }
+    );
 
-      const updatedUser = await User.findByIdAndUpdate(
-          userId,
-          update,
-          {
-              new: true,
-              arrayFilters: action === "update" ? [{ "elem._id": analyticsId }] : []
-          }
-      );
-
-      if (!updatedUser) return res.status(404).json({ message: 'User not found' });
-      res.status(200).json(updatedUser);
+    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json(updatedUser);
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Add or Modify AI Suggestions within a User
+export const modifyUserAiSuggestions = async (req, res) => {
+  const { userId, action, data } = req.body; // action could be "add", "update", "remove"
+  const { aiSuggestionId, suggestions } = data; // data related to AI suggestions
+
+  try {
+    let update;
+
+    if (action === "add") {
+      const newAiSuggestion = { _id: aiSuggestionId, suggestions };
+      update = { $push: { aiSuggestions: newAiSuggestion } };
+    } else if (action === "update") {
+      update = {
+        $set: {
+          "aiSuggestions.$[elem].suggestions": suggestions
+        }
+      };
+    } else if (action === "remove") {
+      update = { $pull: { aiSuggestions: { _id: aiSuggestionId } } };
+    } else {
+      return res.status(400).json({ message: "Invalid action" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      update,
+      {
+        new: true,
+        arrayFilters: action === "update" ? [{ "elem._id": aiSuggestionId }] : []
+      }
+    );
+
+    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
