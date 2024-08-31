@@ -90,13 +90,13 @@ export const deleteUser = async (req, res) => {
 // Add or Modify Room Data within a User
 export const modifyUserRooms = async (req, res) => {
   const { userId, action, data } = req.body; // action could be "add", "update", "remove"
-  const { roomId, roomName } = data; // data related to room
+  const { roomName } = data; // data related to room
 
   try {
     let update;
 
     if (action === "add") {
-      const newRoom = { room_id: roomId, roomName, devices: [] };
+      const newRoom = { roomName, devices: [] };
       update = { $push: { rooms: newRoom } };
     } else if (action === "update") {
       update = {
@@ -105,7 +105,7 @@ export const modifyUserRooms = async (req, res) => {
         }
       };
     } else if (action === "remove") {
-      update = { $pull: { rooms: { _id: roomId } } };
+      update = { $pull: { rooms: { roomName } } };
     } else {
       return res.status(400).json({ message: "Invalid action" });
     }
@@ -115,7 +115,7 @@ export const modifyUserRooms = async (req, res) => {
       update,
       {
         new: true,
-        arrayFilters: action === "update" ? [{ "elem._id": roomId }] : []
+        arrayFilters: action === "update" ? [{ "elem.roomName": roomName }] : []
       }
     );
 
@@ -125,6 +125,7 @@ export const modifyUserRooms = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Add or Modify Analytics Data within a User
 export const modifyUserAnalytics = async (req, res) => {
