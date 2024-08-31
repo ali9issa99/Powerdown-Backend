@@ -89,8 +89,9 @@ export const deleteUser = async (req, res) => {
 
 // Add or Modify Room Data within a User
 export const modifyUserRooms = async (req, res) => {
-  const { userId, action, data } = req.body; // action could be "add", "update", "remove"
+  const { action, data } = req.body; // action could be "add", "update", "remove"
   const { roomName } = data; // data related to room
+  const userId = req.params.id; // Get userId from URL parameters
 
   try {
     let update;
@@ -111,7 +112,7 @@ export const modifyUserRooms = async (req, res) => {
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-      userId,
+      userId, // Use userId from URL params
       update,
       {
         new: true,
@@ -125,6 +126,7 @@ export const modifyUserRooms = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 // Add or Modify Analytics Data within a User
