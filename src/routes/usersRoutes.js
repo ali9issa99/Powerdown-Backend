@@ -44,7 +44,7 @@ router.put("/:id", authMiddleware, updateUser);
 router.delete("/:id", authMiddleware, deleteUser);
 
 // Embedded routes for rooms, devices, consumption, etc.
-router.put("/:id/rooms", authMiddleware, modifyUserRooms);
+router.post("/:id/rooms", authMiddleware, modifyUserRooms);
 router.put("/:id/analytics", authMiddleware, modifyUserAnalytics);
 router.put("/:id/aisuggestions", authMiddleware, modifyUserAiSuggestions);
 
