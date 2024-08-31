@@ -173,8 +173,9 @@ export const modifyUserAnalytics = async (req, res) => {
 
 // Add or Modify AI Suggestions within a User
 export const modifyUserAiSuggestions = async (req, res) => {
-  const { userId, action, data } = req.body; // action could be "add", "update", "remove"
+  const { action, data } = req.body; // action could be "add", "update", "remove"
   const { suggestions } = data; // data related to AI suggestions
+  const userId = req.params.id; // Get userId from URL parameters
 
   try {
     let update;
@@ -195,7 +196,7 @@ export const modifyUserAiSuggestions = async (req, res) => {
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-      userId,
+      userId, // Use userId from URL params
       update,
       {
         new: true,
