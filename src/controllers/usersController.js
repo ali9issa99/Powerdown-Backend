@@ -139,38 +139,31 @@ export const modifyUserRooms = async (req, res) => {
 
 // Add or Modify Analytics Data within a User
 export const modifyUserAnalytics = async (req, res) => {
-  const { action, data } = req.body; // action could be "add", "update", "remove"
-  const { date, totalUsage, averageConsumption } = data; // data related to analytics
-  const userId = req.params.id; // Get userId from URL parameters
+  const { action, data } = req.body;
+
+  // Ensure data is defined
+  if (!data) {
+    return res.status(400).json({ message: "Data is required" });
+  }
+
+  const { date, totalUsage, averageConsumption } = data;
+  const userId = req.params.id;
 
   try {
     let update;
 
-    if (action === "add") {
+    if (action === "addAnalytics") {
       const newAnalytics = { date, totalUsage, averageConsumption };
       update = { $push: { analytics: newAnalytics } };
-    } else if (action === "update") {
-      update = {
-        $set: {
-          "analytics.$[elem].date": date,
-          "analytics.$[elem].totalUsage": totalUsage,
-          "analytics.$[elem].averageConsumption": averageConsumption
-        }
-      };
-    } else if (action === "remove") {
-      update = { $pull: { analytics: { date, totalUsage, averageConsumption } } };
     } else {
       return res.status(400).json({ message: "Invalid action" });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId, // Use userId from URL params
-      update,
-      {
-        new: true,
-        arrayFilters: action === "update" ? [{ "elem.date": date }] : []
-      }
-    );
+    const updateOptions = {
+      new: true,
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(userId, update, updateOptions);
 
     if (!updatedUser) return res.status(404).json({ message: 'User not found' });
     res.status(200).json(updatedUser);
@@ -178,43 +171,7 @@ export const modifyUserAnalytics = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 // Add or Modify AI Suggestions within a User
-export const modifyUserAiSuggestions = async (req, res) => {
-  const { action, data } = req.body; // action could be "add", "update", "remove"
-  const { suggestions } = data; // data related to AI suggestions
-  const userId = req.params.id; // Get userId from URL parameters
-
-  try {
-    let update;
-
-    if (action === "add") {
-      const newAiSuggestion = { suggestions };
-      update = { $push: { aiSuggestions: newAiSuggestion } };
-    } else if (action === "update") {
-      update = {
-        $set: {
-          "aiSuggestions.$[elem].suggestions": suggestions
-        }
-      };
-    } else if (action === "remove") {
-      update = { $pull: { aiSuggestions: { suggestions } } };
-    } else {
-      return res.status(400).json({ message: "Invalid action" });
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(
-      userId, // Use userId from URL params
-      update,
-      {
-        new: true,
-        arrayFilters: action === "update" ? [{ "elem.suggestions": suggestions }] : []
-      }
-    );
-
-    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
