@@ -89,8 +89,8 @@ export const deleteUser = async (req, res) => {
 
 // Add or Modify Room Data within a User
 export const modifyUserRooms = async (req, res) => {
-  const { action, data } = req.body; // action could be "addRoom", "addDevice", "addConsumption", "updateConsumption", "removeConsumption"
-  const { roomName, deviceName, consumption } = data; // data related to room, devices, and consumption
+  const { action, data } = req.body;
+  const { roomName, deviceName, consumption } = data;
   const userId = req.params.id;
 
   try {
@@ -115,36 +115,16 @@ export const modifyUserRooms = async (req, res) => {
         }
       };
       arrayFilters.push({ "room.roomName": roomName }, { "device.deviceName": deviceName });
-    } else if (action === "updateConsumption") {
-      update = {
-        $set: {
-          "rooms.$[room].devices.$[device].consumption.$[consump].timeOn": consumption.timeOn,
-          "rooms.$[room].devices.$[device].consumption.$[consump].energyUsage": consumption.energyUsage
-        }
-      };
-      arrayFilters.push({ "room.roomName": roomName }, { "device.deviceName": deviceName }, { "consump.timeOn": consumption.timeOn });
-    } else if (action === "removeConsumption") {
-      update = {
-        $pull: {
-          "rooms.$[room].devices.$[device].consumption": {
-            timeOn: consumption.timeOn,
-            energyUsage: consumption.energyUsage
-          }
-        }
-      };
-      arrayFilters.push({ "room.roomName": roomName }, { "device.deviceName": deviceName });
     } else {
       return res.status(400).json({ message: "Invalid action" });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      update,
-      {
-        new: true,
-        arrayFilters: arrayFilters.length > 0 ? arrayFilters : undefined
-      }
-    );
+    const updateOptions = {
+      new: true,
+      ...(arrayFilters.length > 0 && { arrayFilters }),
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(userId, update, updateOptions);
 
     if (!updatedUser) return res.status(404).json({ message: 'User not found' });
     res.status(200).json(updatedUser);
