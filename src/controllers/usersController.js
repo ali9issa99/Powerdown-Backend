@@ -89,12 +89,13 @@ export const deleteUser = async (req, res) => {
 
 // Add or Modify Room Data within a User
 export const modifyUserRooms = async (req, res) => {
-  const { action, data } = req.body; // action could be "add", "update", "remove"
+  const { action, data } = req.body; // action could be "addRoom", "addDevice", "addConsumption", "updateConsumption", "removeConsumption"
   const { roomName, deviceName, consumption } = data; // data related to room, devices, and consumption
   const userId = req.params.id;
 
   try {
     let update;
+    let arrayFilters = [];
 
     if (action === "addRoom") {
       const newRoom = { roomName, devices: [] };
@@ -106,12 +107,14 @@ export const modifyUserRooms = async (req, res) => {
           "rooms.$[room].devices": newDevice
         }
       };
+      arrayFilters.push({ "room.roomName": roomName });
     } else if (action === "addConsumption") {
       update = {
         $push: {
           "rooms.$[room].devices.$[device].consumption": consumption
         }
       };
+      arrayFilters.push({ "room.roomName": roomName }, { "device.deviceName": deviceName });
     } else if (action === "updateConsumption") {
       update = {
         $set: {
@@ -119,6 +122,7 @@ export const modifyUserRooms = async (req, res) => {
           "rooms.$[room].devices.$[device].consumption.$[consump].energyUsage": consumption.energyUsage
         }
       };
+      arrayFilters.push({ "room.roomName": roomName }, { "device.deviceName": deviceName }, { "consump.timeOn": consumption.timeOn });
     } else if (action === "removeConsumption") {
       update = {
         $pull: {
@@ -128,6 +132,7 @@ export const modifyUserRooms = async (req, res) => {
           }
         }
       };
+      arrayFilters.push({ "room.roomName": roomName }, { "device.deviceName": deviceName });
     } else {
       return res.status(400).json({ message: "Invalid action" });
     }
@@ -137,11 +142,7 @@ export const modifyUserRooms = async (req, res) => {
       update,
       {
         new: true,
-        arrayFilters: [
-          { "room.roomName": roomName },
-          { "device.deviceName": deviceName },
-          { "consump.timeOn": consumption ? consumption.timeOn : null } // Only relevant for update or remove actions
-        ]
+        arrayFilters: arrayFilters.length > 0 ? arrayFilters : undefined
       }
     );
 
@@ -151,6 +152,7 @@ export const modifyUserRooms = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 
