@@ -130,13 +130,13 @@ export const modifyUserRooms = async (req, res) => {
 // Add or Modify Analytics Data within a User
 export const modifyUserAnalytics = async (req, res) => {
   const { userId, action, data } = req.body; // action could be "add", "update", "remove"
-  const { analyticsId, date, totalUsage, averageConsumption } = data; // data related to analytics
+  const { date, totalUsage, averageConsumption } = data; // data related to analytics
 
   try {
     let update;
 
     if (action === "add") {
-      const newAnalytics = { _id: analyticsId, date, totalUsage, averageConsumption };
+      const newAnalytics = { date, totalUsage, averageConsumption };
       update = { $push: { analytics: newAnalytics } };
     } else if (action === "update") {
       update = {
@@ -147,7 +147,7 @@ export const modifyUserAnalytics = async (req, res) => {
         }
       };
     } else if (action === "remove") {
-      update = { $pull: { analytics: { _id: analyticsId } } };
+      update = { $pull: { analytics: { date, totalUsage, averageConsumption } } };
     } else {
       return res.status(400).json({ message: "Invalid action" });
     }
@@ -157,7 +157,7 @@ export const modifyUserAnalytics = async (req, res) => {
       update,
       {
         new: true,
-        arrayFilters: action === "update" ? [{ "elem._id": analyticsId }] : []
+        arrayFilters: action === "update" ? [{ "elem.date": date }] : []
       }
     );
 
