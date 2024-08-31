@@ -175,3 +175,43 @@ export const modifyUserAnalytics = async (req, res) => {
 
 
 // Add or Modify AI Suggestions within a User
+export const modifyUserAiSuggestions = async (req, res) => {
+  const { action, data } = req.body;
+  const { suggestions } = data;
+  const userId = req.params.id;
+
+  try {
+    let update;
+
+    if (action === "add") {
+      const newAiSuggestion = { suggestions };
+      update = { $push: { aiSuggestions: newAiSuggestion } };
+    } else if (action === "update") {
+      update = {
+        $set: {
+          "aiSuggestions.$[elem].suggestions": suggestions
+        }
+      };
+    } else if (action === "remove") {
+      update = { $pull: { aiSuggestions: { suggestions } } };
+    } else {
+      return res.status(400).json({ message: "Invalid action" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      update,
+      {
+        new: true,
+        arrayFilters: action === "update" ? [{ "elem.suggestions": suggestions }] : []
+      }
+    );
+
+    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error in modifyUserAiSuggestions:", error);  // Log error to server console
+    res.status(500).json({ error: error.message });
+  }
+};
