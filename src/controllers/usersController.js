@@ -171,13 +171,13 @@ export const modifyUserAnalytics = async (req, res) => {
 // Add or Modify AI Suggestions within a User
 export const modifyUserAiSuggestions = async (req, res) => {
   const { userId, action, data } = req.body; // action could be "add", "update", "remove"
-  const { aiSuggestionId, suggestions } = data; // data related to AI suggestions
+  const { suggestions } = data; // data related to AI suggestions
 
   try {
     let update;
 
     if (action === "add") {
-      const newAiSuggestion = { _id: aiSuggestionId, suggestions };
+      const newAiSuggestion = { suggestions };
       update = { $push: { aiSuggestions: newAiSuggestion } };
     } else if (action === "update") {
       update = {
@@ -186,7 +186,7 @@ export const modifyUserAiSuggestions = async (req, res) => {
         }
       };
     } else if (action === "remove") {
-      update = { $pull: { aiSuggestions: { _id: aiSuggestionId } } };
+      update = { $pull: { aiSuggestions: { suggestions } } };
     } else {
       return res.status(400).json({ message: "Invalid action" });
     }
@@ -196,7 +196,7 @@ export const modifyUserAiSuggestions = async (req, res) => {
       update,
       {
         new: true,
-        arrayFilters: action === "update" ? [{ "elem._id": aiSuggestionId }] : []
+        arrayFilters: action === "update" ? [{ "elem.suggestions": suggestions }] : []
       }
     );
 
