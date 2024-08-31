@@ -131,8 +131,9 @@ export const modifyUserRooms = async (req, res) => {
 
 // Add or Modify Analytics Data within a User
 export const modifyUserAnalytics = async (req, res) => {
-  const { userId, action, data } = req.body; // action could be "add", "update", "remove"
+  const { action, data } = req.body; // action could be "add", "update", "remove"
   const { date, totalUsage, averageConsumption } = data; // data related to analytics
+  const userId = req.params.id; // Get userId from URL parameters
 
   try {
     let update;
@@ -155,7 +156,7 @@ export const modifyUserAnalytics = async (req, res) => {
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-      userId,
+      userId, // Use userId from URL params
       update,
       {
         new: true,
