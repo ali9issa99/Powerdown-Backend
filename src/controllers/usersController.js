@@ -90,8 +90,8 @@ export const deleteUser = async (req, res) => {
 // Add or Modify Room Data within a User
 export const modifyUserRooms = async (req, res) => {
   const { action, data } = req.body; // action could be "add", "update", "remove"
-  const { roomName } = data; // data related to room
-  const userId = req.params.id; // Get userId from URL parameters
+  const { roomName, device } = data; // data related to room and devices
+  const userId = req.params.id;
 
   try {
     let update;
@@ -99,10 +99,10 @@ export const modifyUserRooms = async (req, res) => {
     if (action === "add") {
       const newRoom = { roomName, devices: [] };
       update = { $push: { rooms: newRoom } };
-    } else if (action === "update") {
+    } else if (action === "update" && device) {
       update = {
-        $set: {
-          "rooms.$[elem].roomName": roomName
+        $push: {
+          "rooms.$[room].devices": device
         }
       };
     } else if (action === "remove") {
@@ -112,11 +112,11 @@ export const modifyUserRooms = async (req, res) => {
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-      userId, // Use userId from URL params
+      userId,
       update,
       {
         new: true,
-        arrayFilters: action === "update" ? [{ "elem.roomName": roomName }] : []
+        arrayFilters: [{ "room.roomName": roomName }]
       }
     );
 
