@@ -90,7 +90,7 @@ export const deleteUser = async (req, res) => {
 // Add or Modify Room Data within a User
 export const modifyUserRooms = async (req, res) => {
   const { action, data } = req.body;
-  const { roomName, deviceName, consumption } = data;
+  const { roomName, deviceName } = data;
   const userId = req.params.id;
 
   try {
@@ -115,6 +115,13 @@ export const modifyUserRooms = async (req, res) => {
         }
       };
       arrayFilters.push({ "room.roomName": roomName }, { "device.deviceName": deviceName });
+    } else if (action === "removeDevice") {
+      update = {
+        $pull: {
+          "rooms.$[room].devices": { deviceName }
+        }
+      };
+      arrayFilters.push({ "room.roomName": roomName });
     } else {
       return res.status(400).json({ message: "Invalid action" });
     }
@@ -132,6 +139,7 @@ export const modifyUserRooms = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 
