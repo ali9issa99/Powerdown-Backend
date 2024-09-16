@@ -15,7 +15,8 @@ export const deviceSchema = new Schema({
         type: String, 
         enum: ["on", "off"],
         required: true
-    }, // Embedding Consumption // Embedding Consumption
+    }, 
+   devices: [consumptionSchema]// Embedding Consumption // Embedding Consumption
 });
 
 export const Device = mongoose.model('Device', deviceSchema);
