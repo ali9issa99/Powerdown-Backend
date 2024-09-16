@@ -1,6 +1,7 @@
 import { User } from "../models/userModel.js";
 import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken.js';
+import { Configuration, OpenAIApi } from 'openai';
 
 // Create User with embedded rooms, analytics, and AI suggestions
 export const createUser = async (req, res) => {
@@ -182,23 +183,43 @@ export const modifyUserAnalytics = async (req, res) => {
 
 
 
+
+// Initialize OpenAI API
+const openaiApiKey = process.env.OPENAI_API_KEY || 'your-openai-api-key';
+const configuration = new Configuration({
+  apiKey: openaiApiKey,
+});
+const openai = new OpenAIApi(configuration);
+
 // Add or Modify AI Suggestions within a User
 export const modifyUserAiSuggestions = async (req, res) => {
   const { action, data } = req.body;
-  const { suggestions } = data;
+  const { suggestions, houseDetails } = data || {};
   const userId = req.params.id;
 
   try {
     let update;
 
+    // Fetch suggestions from OpenAI if it's an "add" action
     if (action === "add") {
-      const newAiSuggestion = { suggestions };
+      // Call OpenAI API to get suggestions
+      const openaiResponse = await openai.createChatCompletion({
+        model: 'gpt-4', // Or 'gpt-3.5-turbo' based on your OpenAI plan
+        messages: [
+          { role: 'system', content: 'You are an expert in energy consumption optimization.' },
+          { role: 'user', content: `Provide suggestions to optimize energy consumption for the following house details: ${houseDetails}` }
+        ],
+        max_tokens: 200, // Adjust token limit as necessary
+      });
+
+      // Extract suggestions from OpenAI response
+      const aiGeneratedSuggestions = openaiResponse.data.choices[0].message.content;
+
+      const newAiSuggestion = { suggestions: aiGeneratedSuggestions };
       update = { $push: { aiSuggestions: newAiSuggestion } };
     } else if (action === "update") {
       update = {
-        $set: {
-          "aiSuggestions.$[elem].suggestions": suggestions
-        }
+        $set: { "aiSuggestions.$[elem].suggestions": suggestions }
       };
     } else if (action === "remove") {
       update = { $pull: { aiSuggestions: { suggestions } } };
@@ -219,7 +240,7 @@ export const modifyUserAiSuggestions = async (req, res) => {
 
     res.status(200).json(updatedUser);
   } catch (error) {
-    console.error("Error in modifyUserAiSuggestions:", error);  // Log error to server console
+    console.error("Error in modifyUserAiSuggestions:", error);
     res.status(500).json({ error: error.message });
   }
 };
