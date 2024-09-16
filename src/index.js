@@ -35,9 +35,11 @@ import dotenv from "dotenv";
 import usersRoutes from "./routes/usersRoutes.js";
 import authRoutes from "./routes/authRoutes.js"; 
 import connectToDatabase from "./database/connection.js";
+import cors from 'cors';
 
 dotenv.config();
 const app = express();
+app.use(cors());
 
 app.use(express.json());
 
