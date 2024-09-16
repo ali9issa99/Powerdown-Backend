@@ -31,6 +31,7 @@ import {
     modifyUserRooms,
     modifyUserAnalytics,
     modifyUserAiSuggestions,
+    getUserAiSuggestions,
 } from '../controllers/usersController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -47,5 +48,6 @@ router.delete("/:id", authMiddleware, deleteUser);
 router.post("/:id/rooms", authMiddleware, modifyUserRooms);
 router.put("/:id/analytics", authMiddleware, modifyUserAnalytics);
 router.put("/:id/aisuggestions", authMiddleware, modifyUserAiSuggestions);
+router.get("/:id/aisuggestions", authMiddleware, getUserAiSuggestions);
 
 export default router;
