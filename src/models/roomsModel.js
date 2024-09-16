@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 // import { deviceSchema } from "./devicesModel.js";
 import { consumptionSchema } from "./consumptionModel.js";
+import { deviceSchema } from "./devicesModel.js";
 
 
 export const roomSchema = new Schema({
@@ -13,11 +14,7 @@ export const roomSchema = new Schema({
         type: String,
         required: true 
     },
-    devices: [{
-        deviceName: { type: String, required: true },
-        status: { type: String, enum: ['on', 'off'], default: 'off' },
-        consumption: [consumptionSchema]
-      }] // Embedding Device
+    devices: [deviceSchema] // Embedding Device
 });
   
   export const Room = mongoose.model('Room', roomSchema);
