@@ -4,18 +4,18 @@ import { Device } from "../models/devicesModel.js";
 // Create Room
 export const createRoom = async (req, res) => {
     try {
-        const { room_id, roomName } = req.body;
+        const { room_id, roomName, devices } = req.body;
 
         // Check if room_id already exists
         const existingRoom = await Room.findOne({ room_id });
         if (existingRoom) {
             return res.status(400).json({ error: 'room_id already exists' });
         }
-
+        //loop over the up devices array(strings), to create device objects
         const newRoom = new Room({
             room_id,
             roomName,
-            devices: []
+            devices: [] // array of objects to be created
         });
 
         await newRoom.save();
