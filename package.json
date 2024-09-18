@@ -18,8 +18,11 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.3",
-    "openai": "^4.61.1",
+    "openai": "^4.62.1",
     "uuid": "^10.0.0",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
   }
 }
