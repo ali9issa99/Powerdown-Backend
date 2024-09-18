@@ -36,6 +36,20 @@ import usersRoutes from "./routes/usersRoutes.js";
 import authRoutes from "./routes/authRoutes.js"; 
 import connectToDatabase from "./database/connection.js";
 import cors from 'cors';
+import { spawn } from 'child_process';
+
+// Start websockets.js as a child process
+const webSocketProcess = spawn('node', ['./services/websockets.js'], {
+  stdio: 'inherit' // This will pipe the output from websockets.js to the main terminal
+});
+
+webSocketProcess.on('close', (code) => {
+  console.log(`websockets.js process exited with code ${code}`);
+});
+
+// Rest of your index.js logic...
+console.log('index.js is running...');
+
 
 dotenv.config();
 const app = express();
