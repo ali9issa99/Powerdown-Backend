@@ -1,39 +1,85 @@
 import { User } from "../models/userModel.js";
 import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken.js';
-import { Configuration, OpenAIApi } from 'openai';
+// import OpenAI from 'openai';
+// Import Configuration and OpenAIApi from openai package
+// import { Configuration, OpenAIApi } from 'openai';
 
-// Create User with embedded rooms, analytics, and AI suggestions
-export const createUser = async (req, res) => {
+
+
+import jwt from 'jsonwebtoken';
+ // Ensure correct model import
+
+
+
+
+
+// controllers/usersController.js
+
+export const createUser = async ({ name, email, password }) => {
   try {
-    const { name, email, password } = req.body;
-
+    // Check if the user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      throw new Error('User already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Do NOT hash the password here; pass it as is
     const newUser = new User({
       name,
       email,
-      password: hashedPassword,
-      rooms: [], // Initialize with an empty array of rooms
-      analytics: [], // Initialize with an empty array of analytics
-      aiSuggestions: [] // Initialize with an empty array of AI suggestions
+      password, // Pass the plain password
+      rooms: [],
+      analytics: [],
+      aiSuggestions: [],
     });
 
-    await newUser.save();
-    res.status(201).json({
-      _id: newUser._id,
-      name: newUser.name,
-      email: newUser.email,
-      token: generateToken(newUser._id),
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    // Save the new user to the database
+    const savedUser = await newUser.save();
+
+    return savedUser;
+  } catch (err) {
+    throw new Error('Error creating user: ' + err.message);
   }
 };
+
+
+
+
+
+
+
+// // Create User with embedded rooms, analytics, and AI suggestions
+// export const createUser = async (req, res) => {
+//   try {
+//     const { name, email, password } = req.body;
+
+//     const userExists = await User.findOne({ email });
+//     if (userExists) {
+//       return res.status(400).json({ message: 'User already exists' });
+//     }
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     const newUser = new User({
+//       name,
+//       email,
+//       password: hashedPassword,
+//       rooms: [], // Initialize with an empty array of rooms
+//       analytics: [], // Initialize with an empty array of analytics
+//       aiSuggestions: [] // Initialize with an empty array of AI suggestions
+//     });
+
+//     await newUser.save();
+//     res.status(201).json({
+//       _id: newUser._id,
+//       name: newUser.name,
+//       email: newUser.email,
+//       token: generateToken(newUser._id),
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 // Get a User by ID (with embedded rooms, analytics, and AI suggestions)
 export const getUsers = async (req, res) => {
@@ -88,6 +134,23 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+
+
+
+export const getUserByEmail = async (email) => {
+  try {
+    return await User.findOne({ email });
+  } catch (err) {
+    throw new Error('Error fetching user by email');
+  }
+};
+
+
+
+
+
+
+
 // Add or Modify Room Data within a User
 export const modifyUserRooms = async (req, res) => {
   const { action, data } = req.body;
@@ -105,22 +168,8 @@ export const modifyUserRooms = async (req, res) => {
       const newDevice = { deviceName, status: "off", consumption: [] };
       update = {
         $push: {
-          "rooms.$[room].devices": newDevice
-        }
-      };
-      arrayFilters.push({ "room.roomName": roomName });
-    } else if (action === "addConsumption") {
-      update = {
-        $push: {
-          "rooms.$[room].devices.$[device].consumption": consumption
-        }
-      };
-      arrayFilters.push({ "room.roomName": roomName }, { "device.deviceName": deviceName });
-    } else if (action === "removeDevice") {
-      update = {
-        $pull: {
-          "rooms.$[room].devices": { deviceName }
-        }
+          "rooms.$[room].devices": newDevice,
+        },
       };
       arrayFilters.push({ "room.roomName": roomName });
     } else {
@@ -134,12 +183,13 @@ export const modifyUserRooms = async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(userId, update, updateOptions);
 
-    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+    if (!updatedUser) return res.status(404).json({ message: "User not found" });
     res.status(200).json(updatedUser);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 
@@ -184,63 +234,74 @@ export const modifyUserAnalytics = async (req, res) => {
 
 
 
-// Initialize OpenAI API
-const openaiApiKey = process.env.OPENAI_API_KEY || 'your-openai-api-key';
-const configuration = new Configuration({
-  apiKey: openaiApiKey,
-});
-const openai = new OpenAIApi(configuration);
 
-// Add or Modify AI Suggestions within a User
+
+
+
+import OpenAI from 'openai';
+
+export const getUserAiSuggestions = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ aiSuggestions: user.aiSuggestions });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch AI suggestions', error: error.message });
+  }
+};
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || 'your-openai-api-key',
+});
+
 export const modifyUserAiSuggestions = async (req, res) => {
   const { action, data } = req.body;
-  const { suggestions, houseDetails } = data || {};
   const userId = req.params.id;
 
   try {
-    let update;
+    let user = await User.findById(userId);
 
-    // Fetch suggestions from OpenAI if it's an "add" action
-    if (action === "add") {
-      // Call OpenAI API to get suggestions
-      const openaiResponse = await openai.createChatCompletion({
-        model: 'gpt-4', // Or 'gpt-3.5-turbo' based on your OpenAI plan
-        messages: [
-          { role: 'system', content: 'You are an expert in energy consumption optimization.' },
-          { role: 'user', content: `Provide suggestions to optimize energy consumption for the following house details: ${houseDetails}` }
-        ],
-        max_tokens: 200, // Adjust token limit as necessary
-      });
-
-      // Extract suggestions from OpenAI response
-      const aiGeneratedSuggestions = openaiResponse.data.choices[0].message.content;
-
-      const newAiSuggestion = { suggestions: aiGeneratedSuggestions };
-      update = { $push: { aiSuggestions: newAiSuggestion } };
-    } else if (action === "update") {
-      update = {
-        $set: { "aiSuggestions.$[elem].suggestions": suggestions }
-      };
-    } else if (action === "remove") {
-      update = { $pull: { aiSuggestions: { suggestions } } };
-    } else {
-      return res.status(400).json({ message: "Invalid action" });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      update,
-      {
-        new: true,
-        arrayFilters: action === "update" ? [{ "elem.suggestions": suggestions }] : []
+    let houseDetails = data?.houseDetails || user.houseDetails || 'a standard household';
+
+    if (action === 'add' || user.aiSuggestions.length === 0) {
+      try {
+        const openaiResponse = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages: [
+            { role: 'system', content: 'You are an expert in energy consumption optimization.' },
+            { role: 'user', content: `Provide 3 suggestions to optimize energy consumption for the following house details: ${houseDetails}` },
+          ],
+          max_tokens: 200,
+        });
+
+        const aiGeneratedSuggestions = openaiResponse.choices[0]?.message?.content || 'No suggestions available.';
+
+        const newAiSuggestion = { suggestions: aiGeneratedSuggestions };
+
+        await User.findByIdAndUpdate(
+          userId,
+          { $push: { aiSuggestions: newAiSuggestion } },
+          { new: true }
+        );
+
+        user = await User.findById(userId);
+        return res.status(200).json(user);
+      } catch (error) {
+        return res.status(500).json({ message: `Failed to get suggestions from OpenAI: ${error.message}` });
       }
-    );
+    }
 
-    if (!updatedUser) return res.status(404).json({ message: 'User not found' });
-
-    res.status(200).json(updatedUser);
+    res.status(200).json(user);  
   } catch (error) {
-    console.error("Error in modifyUserAiSuggestions:", error);
+    console.error('Error in modifyUserAiSuggestions:', error);
     res.status(500).json({ error: error.message });
   }
 };
