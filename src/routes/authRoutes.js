@@ -76,7 +76,7 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ success: false, message: 'User already exists.' });
     }
 
-    // Do not hash the password here; pass it as is
+    // Create a new user
     const newUser = await createUser({ name, email, password });
 
     // Generate the token
@@ -91,17 +91,10 @@ router.post('/register', async (req, res) => {
       email: newUser.email,
     });
   } catch (err) {
-    console.error("Error during registration:", err.message);
+    console.error("Error during registration:", err); // Log the entire error object
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
-
-// Login route remains the same
-// ... (no changes needed)
-
-
-
-
 
 // Login route
 router.post('/login', async (req, res) => {
@@ -136,10 +129,15 @@ router.post('/login', async (req, res) => {
       email: user.email,
     });
   } catch (err) {
-    console.error("Error during login:", err.message);
+    console.error("Error during login:", err); // Log the entire error object
     res.status(500).json({ success: false, message: 'Server error' });
   }
+//   console.log("Plain password from request:", password);
+// console.log("Hashed password from database:", user.password);
+
 });
+
+
 
 
 

@@ -16,6 +16,8 @@ import jwt from 'jsonwebtoken';
 
 // controllers/usersController.js
 
+import { v4 as uuidv4 } from 'uuid';
+
 export const createUser = async ({ name, email, password }) => {
   try {
     // Check if the user already exists
@@ -24,12 +26,25 @@ export const createUser = async ({ name, email, password }) => {
       throw new Error('User already exists');
     }
 
-    // Do NOT hash the password here; pass it as is
+    // Create a default room with a unique room_id and a default device with a unique device_id
     const newUser = new User({
       name,
       email,
-      password, // Pass the plain password
-      rooms: [],
+      password, // Store the plain password; it will be hashed in the pre-save hook
+      rooms: [
+        {
+          room_id: uuidv4(),
+          roomName: 'Default Room',
+          devices: [
+            {
+              device_id: uuidv4(),
+              deviceName: 'Default Device',
+              status: 'off',
+              consumption: [],
+            },
+          ],
+        },
+      ],
       analytics: [],
       aiSuggestions: [],
     });
@@ -39,9 +54,14 @@ export const createUser = async ({ name, email, password }) => {
 
     return savedUser;
   } catch (err) {
+    console.error('Error creating user:', err);
     throw new Error('Error creating user: ' + err.message);
   }
 };
+
+
+
+
 
 
 
@@ -141,9 +161,11 @@ export const getUserByEmail = async (email) => {
   try {
     return await User.findOne({ email });
   } catch (err) {
+    console.error('Error fetching user by email:', err); // Log the full error object
     throw new Error('Error fetching user by email');
   }
 };
+
 
 
 
