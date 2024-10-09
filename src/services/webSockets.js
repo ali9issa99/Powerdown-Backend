@@ -1,15 +1,26 @@
 import { WebSocketServer } from 'ws';  // Adjust import
 
-const wss = new WebSocketServer({ port: 8081 });  // Change to a different port (8081)
+const wss = new WebSocketServer({ host: '0.0.0.0', port: 8081 });  // Change to 0.0.0.0 and port 8081
 
 let esp8266Client = null; // To keep track of ESP8266 connection
 let flutterClient = null; // To keep track of Flutter client connection
+
+// Error handling for the WebSocket server
+wss.on('error', (error) => {
+  console.error('WebSocket Server Error:', error);
+});
 
 wss.on('connection', (ws) => {
   console.log('New client connected');
 
   ws.on('message', (message) => {
-    const data = JSON.parse(message);
+    let data;
+    try {
+      data = JSON.parse(message);
+    } catch (e) {
+      console.error('Invalid JSON message received:', message);
+      return;
+    }
 
     // Identify the client (ESP8266 or Flutter)
     if (data.type === 'identify' && data.client === 'esp8266') {
@@ -53,6 +64,11 @@ wss.on('connection', (ws) => {
     if (ws === esp8266Client) esp8266Client = null;
     if (ws === flutterClient) flutterClient = null;
   });
+
+  // Handle errors for each client
+  ws.on('error', (error) => {
+    console.error('WebSocket Client Error:', error);
+  });
 });
 
-console.log('WebSocket server is running on ws://localhost:8081');  // Changed to 8081
+console.log('WebSocket server is running on ws://0.0.0.0:8081');  // Changed to 0.0.0.0 and port 8081
