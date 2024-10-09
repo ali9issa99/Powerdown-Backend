@@ -31,7 +31,7 @@ import {
     modifyUserRooms,
     modifyUserAnalytics,
     modifyUserAiSuggestions,
-    getUserAiSuggestions,
+    getUserAiSuggestions, // <-- Ensure this is imported
 } from '../controllers/usersController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -47,7 +47,10 @@ router.delete("/:id", authMiddleware, deleteUser);
 // Embedded routes for rooms, devices, consumption, etc.
 router.post("/:id/rooms", authMiddleware, modifyUserRooms);
 router.put("/:id/analytics", authMiddleware, modifyUserAnalytics);
+
+// Update this to use GET for fetching AI suggestions
+router.get("/:id/aisuggestions", authMiddleware, getUserAiSuggestions); // <--- Change to GET
+// Use PUT for updating or adding AI suggestions
 router.put("/:id/aisuggestions", authMiddleware, modifyUserAiSuggestions);
-router.get("/:id/aisuggestions", authMiddleware, getUserAiSuggestions);
 
 export default router;
