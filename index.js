@@ -30,17 +30,27 @@
 // });
 
 
+
+
+
+
 import express from "express";
 import dotenv from "dotenv";
-import usersRoutes from "./routes/usersRoutes.js";
-import authRoutes from "./routes/authRoutes.js"; 
-import connectToDatabase from "./database/connection.js";
+dotenv.config();
+import usersRoutes from "./src/routes/usersRoutes.js";
+import authRoutes from "./src/routes/authRoutes.js"; 
+import connectToDatabase from "./src/database/connection.js";
 import cors from 'cors';
 import { spawn } from 'child_process';
 
+
 // Start websockets.js as a child process
-const webSocketProcess = spawn('node', ['./services/websockets.js'], {
+const webSocketProcess = spawn('node', ['./src/services/websockets.js'], {
   stdio: 'inherit' // This will pipe the output from websockets.js to the main terminal
+});
+
+webSocketProcess.on('error', (error) => {
+  console.error(`WebSocket server failed to start: ${error.message}`);
 });
 
 webSocketProcess.on('close', (code) => {
@@ -50,13 +60,13 @@ webSocketProcess.on('close', (code) => {
 // Rest of your index.js logic...
 console.log('index.js is running...');
 
-
 dotenv.config();
+
 const app = express();
 app.use(cors());
 
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 // Authentication routes
 app.use("/auth", authRoutes);
 
